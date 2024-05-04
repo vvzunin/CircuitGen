@@ -13,21 +13,21 @@ include(FetchContent)
 FetchContent_Declare(
   OptimizationsVerilogLib
   GIT_REPOSITORY https://github.com/vvzunin/CircuitGen_Parameters
-  GIT_TAG 0.5.0
+  GIT_TAG 7430c8c
 )
 FetchContent_MakeAvailable(OptimizationsVerilogLib)
 
 FetchContent_Declare(
   CircuitGen_Generator
   GIT_REPOSITORY https://github.com/vvzunin/CircuitGen_Generator
-  GIT_TAG v1.0.1
+  GIT_TAG 1c68c6e63
 )
 FetchContent_MakeAvailable(CircuitGen_Generator)
 
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
-  OptimizationsVerilogLib::OptimizationsVerilogLib 
   CircuitGenGenerator::CircuitGenGenerator
+  OptimizationsVerilogLib::OptimizationsVerilogLib
 )
 

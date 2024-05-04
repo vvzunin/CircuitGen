@@ -17,10 +17,10 @@ int main(int argc, char **argv) {
   const std::string defaultLibPath = "tech_libs/";
   // Use getopt to parse command line arguments
 
-  const char *const short_opts = "j:m:l:n:";
+  const char *const short_opts = "j:ml:n:";
   const option long_opts[] = {
       {"json_path", required_argument, nullptr, 'j'},
-      {"make_optimized", required_argument, nullptr, 'm'},
+      {"make_optimized", no_argument, nullptr, 'm'},
       {"lib_name", required_argument, nullptr, 'l'},
       {"num_nodes", required_argument, nullptr, 'n'}};
   int c;
@@ -54,11 +54,12 @@ int main(int argc, char **argv) {
   if (!makeOptimized) {
     return 0;
   }
+  
 
   for (auto [path, allGraphs] : allRes) {
     for (auto graph : allGraphs) {
-      AbcUtils::optimizeWithLib(graph->getName(), libName,
-                                path + "/" + graph->getName(), defaultLibPath);
+      // AbcUtils::optimizeWithLib(graph->getName() + ".v", libName,
+      //                           path + "/" + graph->getName(), defaultLibPath);
       AbcUtils::resyn2(graph->getName(), libName, path + "/" + graph->getName(),
                        defaultLibPath);
     }
