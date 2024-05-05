@@ -87,8 +87,8 @@ int main(int argc, char **argv) {
   }
 
   // json_path = "../examples/json/sampleALU.json";
-  std::vector<std::pair<std::string, std::vector<GraphPtr>>> allRes =
-      CircuitGenGenerator::runGenerationFromJson(json_path);
+  std::vector<std::pair<std::string, std::vector<std::string>>> allRes =
+      CircuitGenGenerator::runGenerationFromJsonForPath(json_path);
   if (!(makeResyn2 & makeBalanced & toBench)) {
     return 0;
   }
@@ -96,19 +96,19 @@ int main(int argc, char **argv) {
   for (auto [path, allGraphs] : allRes) {
     for (auto graph : allGraphs) {
       if (makeBalanced) {
-        AbcUtils::optimizeWithLib(graph->getName() + ".v", libName,
-                                  path + "/" + graph->getName(),
+        AbcUtils::optimizeWithLib(graph + ".v", libName,
+                                  path + "/" + graph,
                                   defaultLibPath);
       }
 
       if (makeResyn2) {
-        AbcUtils::resyn2(graph->getName(), libName,
-                         path + "/" + graph->getName(), defaultLibPath);
+        AbcUtils::resyn2(graph, libName,
+                         path + "/" + graph, defaultLibPath);
       }
 
       if (toBench) {
-        AbcUtils::verilogToBench(graph->getName(),
-                                 path + "/" + graph->getName());
+        AbcUtils::verilogToBench(graph,
+                                 path + "/" + graph);
       }
     }
   }
