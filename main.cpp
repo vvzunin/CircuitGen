@@ -10,6 +10,62 @@
 #include <string>
 #include <vector>
 
+void writeDataToJson(std::vector<CommandWorkResult> result, std::string i_path,
+                     std::string i_circuitName) {
+  std::ofstream outJson;
+
+  outJson.open(i_path + "/" + i_circuitName + "AbcStats.json");
+  if (!outJson) {
+    std::cerr << "No json file to write" << std::endl;
+    return;
+  }
+
+  outJson << "{" << std::endl;
+
+  for (auto subres = result.begin(); subres != result.end(); ++subres) {
+    std::string optType = (*subres).commandsOutput["optimization_type"];
+    (*subres).commandsOutput.erase("optimization_type");
+    outJson << "\t\"abcStats" << optType << "\": {" << std::endl;
+
+    if ((*subres).correct) {
+      bool first = true;
+      for (const auto &data : (*subres).commandsOutput) {
+        if (first) {
+          first = false;
+          outJson << "\t\t\"" << data.first << "\": " << data.second;
+        } else {
+          outJson << "," << std::endl
+                  << "\t\t\"" << data.first << "\": " << data.second;
+        }
+      }
+      outJson << std::endl;
+    } else {
+      for (int i = (*subres).commandsOutput["error"].find('"');
+           i != std::string::npos;
+           i = (*subres).commandsOutput["error"].find('"', i + 1))
+        (*subres).commandsOutput["error"].erase(i, 1);
+
+      for (int i = (*subres).commandsOutput["error"].find('\n');
+           i != std::string::npos;
+           i = (*subres).commandsOutput["error"].find('\n', i + 1))
+        (*subres).commandsOutput["error"][i] = ';';
+
+      outJson << "\t\t" << "\"error\": \"" << (*subres).commandsOutput["error"]
+              << "\",\n";
+      outJson << "\t\t" << "\"fileRead\": \""
+              << (*subres).commandsOutput["fileRead"] << "\"\n";
+    }
+
+    outJson << "\t}";
+    if (subres + 1 == result.end())
+      outJson << std::endl << "}";
+    else
+      outJson << ',' << std::endl;
+  }
+
+  std::clog << i_circuitName << " ended\n";
+}
+
 int main(int argc, char **argv) {
   std::string json_path, file_path;
 
@@ -127,24 +183,30 @@ int main(int argc, char **argv) {
       return 0;
     }
 
-    for (auto [path, allGraphs] : allRes) {
+    for (auto [main_path, allGraphs] : allRes) {
       for (auto graph : allGraphs) {
+        std::vector<CommandWorkResult> data;
+        std::string path = main_path + "/" + graph;
+
         if (makeBalanced) {
-          AbcUtils::optimizeWithLib(graph + ".v", libName, path + "/" + graph,
-                                    defaultLibPath);
+          data.push_back(AbcUtils::optimizeWithLib(
+              graph, libName, path, defaultLibPath));
         }
 
         if (makeResyn2) {
-          AbcUtils::resyn2(graph, libName, path + "/" + graph, defaultLibPath);
+          data.push_back(AbcUtils::resyn2(graph, libName, path,
+                                          defaultLibPath));
         }
 
         if (toBench) {
-          AbcUtils::verilogToBench(graph, path + "/" + graph);
+          AbcUtils::verilogToBench(graph, path);
         }
 
         if (toFirrtl) {
           YosysUtils::writeFirrtl(graph + ".v", graph + ".firrtl", path);
         }
+
+        writeDataToJson(data, path, graph);
       }
     }
   }
@@ -152,13 +214,15 @@ int main(int argc, char **argv) {
   else if (makeResyn2 || makeBalanced || toBench || toFirrtl) {
     std::string graph = std::filesystem::path(file_path).stem();
     std::string path = std::filesystem::path(file_path).parent_path();
+    std::vector<CommandWorkResult> data;
 
     if (makeBalanced) {
-      AbcUtils::optimizeWithLib(graph, libName, path, defaultLibPath);
+      data.push_back(
+          AbcUtils::optimizeWithLib(graph, libName, path, defaultLibPath));
     }
 
     if (makeResyn2) {
-      AbcUtils::resyn2(graph, libName, path, defaultLibPath);
+      data.push_back(AbcUtils::resyn2(graph, libName, path, defaultLibPath));
     }
 
     if (toBench) {
@@ -168,6 +232,8 @@ int main(int argc, char **argv) {
     if (toFirrtl) {
       YosysUtils::writeFirrtl(graph + ".v", graph + ".firrtl", path);
     }
+
+    writeDataToJson(data, path, graph);
   }
 
   return 0;
