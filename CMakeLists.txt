@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(TestMain LANGUAGES CXX)
+project(CicruitGen LANGUAGES CXX)
 
 set(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -std=c++17 -fPIC")
