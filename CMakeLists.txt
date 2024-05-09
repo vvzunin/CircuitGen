@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(CicruitGen LANGUAGES CXX)
+project(CircuitGen LANGUAGES CXX)
 
 set(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -std=c++17 -fPIC")
@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(OptimizationsVerilogLib)
 FetchContent_Declare(
   CircuitGen_Generator
   GIT_REPOSITORY https://github.com/vvzunin/CircuitGen_Generator
-  GIT_TAG be62123
+  GIT_TAG 5d9334475
 )
 FetchContent_MakeAvailable(CircuitGen_Generator)
 

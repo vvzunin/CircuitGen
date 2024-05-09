@@ -3,70 +3,18 @@
 
 #include <AbcUtils.hpp>
 #include <CircuitGenGenerator/CircuitGenGenerator.hpp>
+#include <CircuitGenGenerator/ThreadPool.hpp>
 #include <YosysUtils.hpp>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
 
-void writeDataToJson(std::vector<CommandWorkResult> result, std::string i_path,
-                     std::string i_circuitName) {
-  std::ofstream outJson;
+#include "GraphAbcFolder.hpp"
 
-  outJson.open(i_path + "/" + i_circuitName + "AbcStats.json");
-  if (!outJson) {
-    std::cerr << "No json file to write" << std::endl;
-    return;
-  }
-
-  outJson << "{" << std::endl;
-
-  for (auto subres = result.begin(); subres != result.end(); ++subres) {
-    std::string optType = (*subres).commandsOutput["optimization_type"];
-    (*subres).commandsOutput.erase("optimization_type");
-    outJson << "\t\"abcStats" << optType << "\": {" << std::endl;
-
-    if ((*subres).correct) {
-      bool first = true;
-      for (const auto &data : (*subres).commandsOutput) {
-        if (first) {
-          first = false;
-          outJson << "\t\t\"" << data.first << "\": " << data.second;
-        } else {
-          outJson << "," << std::endl
-                  << "\t\t\"" << data.first << "\": " << data.second;
-        }
-      }
-      outJson << std::endl;
-    } else {
-      for (int i = (*subres).commandsOutput["error"].find('"');
-           i != std::string::npos;
-           i = (*subres).commandsOutput["error"].find('"', i + 1))
-        (*subres).commandsOutput["error"].erase(i, 1);
-
-      for (int i = (*subres).commandsOutput["error"].find('\n');
-           i != std::string::npos;
-           i = (*subres).commandsOutput["error"].find('\n', i + 1))
-        (*subres).commandsOutput["error"][i] = ';';
-
-      outJson << "\t\t" << "\"error\": \"" << (*subres).commandsOutput["error"]
-              << "\",\n";
-      outJson << "\t\t" << "\"fileRead\": \""
-              << (*subres).commandsOutput["fileRead"] << "\"\n";
-    }
-
-    outJson << "\t}";
-    if (subres + 1 == result.end())
-      outJson << std::endl << "}";
-    else
-      outJson << ',' << std::endl;
-  }
-
-  std::clog << i_circuitName << " ended\n";
-}
-
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   std::string json_path, file_path;
 
   bool makeBalanced = false;
@@ -74,14 +22,17 @@ int main(int argc, char **argv) {
   bool toBench = false;
   bool toFirrtl = false;
 
+  uint8_t threadsNumber = 1;
+
   std::string libName = "sky130.lib";
 
   const std::string defaultLibPath = "tech_libs/";
   // Use getopt to parse command line arguments
 
-  const char *const short_opts = "hf:j:rbBFl:";
+  const char* const short_opts = "ht:f:j:rbBFl:";
   const option long_opts[] = {{"json_path", required_argument, nullptr, 'j'},
                               {"file_path", required_argument, nullptr, 'f'},
+                              {"threads", required_argument, nullptr, 't'},
                               {"make_resyn2", no_argument, nullptr, 'r'},
                               {"make_balance", no_argument, nullptr, 'b'},
                               {"to_bench", no_argument, nullptr, 'B'},
@@ -91,6 +42,8 @@ int main(int argc, char **argv) {
   int c;
 
   int opt;
+  int32_t sub;
+
   while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
          -1) {
     switch (opt) {
@@ -99,6 +52,19 @@ int main(int argc, char **argv) {
         break;
       case 'f':
         file_path = optarg;
+        break;
+      case 't':
+        sub = atoi(optarg);
+        if (sub <= 0) {
+          std::cerr << "\tThreads number must be 0!" << std::endl;
+          return 1;
+        }
+        if (sub > 255) {
+          std::cerr << "\tThreads number must be lower (or equal) than 255!"
+                    << std::endl;
+          return 1;
+        }
+        threadsNumber = sub;
         break;
       case 'b':
         makeBalanced = true;
@@ -174,6 +140,9 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  Threading::ThreadPool pool(threadsNumber);
+  std::vector<std::shared_ptr<GraphAbcFolder>> folder;
+
   if (json_path.size()) {
     // json_path = "../examples/json/sampleALU.json";
     std::vector<std::pair<std::string, std::vector<std::string>>> allRes =
@@ -185,28 +154,28 @@ int main(int argc, char **argv) {
 
     for (auto [main_path, allGraphs] : allRes) {
       for (auto graph : allGraphs) {
-        std::vector<CommandWorkResult> data;
         std::string path = main_path + "/" + graph;
 
+        std::shared_ptr<GraphAbcFolder> ptr(
+            new GraphAbcFolder(path, graph, libName, defaultLibPath,
+                               ((int)makeBalanced) + ((int)makeResyn2)));
+        folder.push_back(ptr);
+
         if (makeBalanced) {
-          data.push_back(AbcUtils::optimizeWithLib(
-              graph, libName, path, defaultLibPath));
+          pool.submit((*folder.back()).callOptimize);
         }
 
         if (makeResyn2) {
-          data.push_back(AbcUtils::resyn2(graph, libName, path,
-                                          defaultLibPath));
+          pool.submit((*folder.back()).callResyn2);
         }
 
         if (toBench) {
-          AbcUtils::verilogToBench(graph, path);
+          pool.submit((*folder.back()).callToBench);
         }
 
         if (toFirrtl) {
-          YosysUtils::writeFirrtl(graph + ".v", graph + ".firrtl", path);
+          pool.submit((*folder.back()).callToFirrtl);
         }
-
-        writeDataToJson(data, path, graph);
       }
     }
   }
@@ -214,27 +183,30 @@ int main(int argc, char **argv) {
   else if (makeResyn2 || makeBalanced || toBench || toFirrtl) {
     std::string graph = std::filesystem::path(file_path).stem();
     std::string path = std::filesystem::path(file_path).parent_path();
-    std::vector<CommandWorkResult> data;
+
+    std::shared_ptr<GraphAbcFolder> ptr(
+        new GraphAbcFolder(path, graph, libName, defaultLibPath,
+                           ((int)makeBalanced) + ((int)makeResyn2)));
+    folder.push_back(ptr);
 
     if (makeBalanced) {
-      data.push_back(
-          AbcUtils::optimizeWithLib(graph, libName, path, defaultLibPath));
+      pool.submit((*folder.back()).callOptimize);
     }
 
     if (makeResyn2) {
-      data.push_back(AbcUtils::resyn2(graph, libName, path, defaultLibPath));
+      pool.submit((*folder.back()).callResyn2);
     }
 
     if (toBench) {
-      AbcUtils::verilogToBench(graph, path);
+      pool.submit((*folder.back()).callToBench);
     }
 
     if (toFirrtl) {
-      YosysUtils::writeFirrtl(graph + ".v", graph + ".firrtl", path);
+      pool.submit((*folder.back()).callToFirrtl);
     }
-
-    writeDataToJson(data, path, graph);
   }
+
+  pool.wait();
 
   return 0;
 }
