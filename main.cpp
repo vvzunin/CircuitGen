@@ -5,12 +5,15 @@
 #include <CircuitGenGenerator/CircuitGenGenerator.hpp>
 #include <CircuitGenGenerator/ThreadPool.hpp>
 #include <YosysUtils.hpp>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
+
+using namespace std::chrono;
 
 #include "GraphAbcFolder.hpp"
 
@@ -56,11 +59,11 @@ int main(int argc, char** argv) {
       case 't':
         sub = atoi(optarg);
         if (sub <= 0) {
-          std::cerr << "\tThreads number must be 0!" << std::endl;
+          std::cerr << "\tThreads number must be more than 0!" << std::endl;
           return 1;
         }
         if (sub > 255) {
-          std::cerr << "\tThreads number must be lower (or equal) than 255!"
+          std::cerr << "\tThreads number must be less (or equal) than 255!"
                     << std::endl;
           return 1;
         }
@@ -116,6 +119,11 @@ int main(int argc, char** argv) {
                "by Berkeley-abc (default sky130.lib).\n\t\tFile should be "
                "located in the folder tech_libs."
             << std::endl;
+        std::cout
+            << "\t-t <threads number> or --threads <threads number>:\n\t\tSets "
+               "number of threads, used for running abc.\n\t\tNumber of "
+               "threads should be more than 0 and less than 256."
+            << std::endl;
         std::cout << "\t-h or --help:\n\t\tShows all commands being used."
                   << std::endl;
         return 0;
@@ -142,6 +150,8 @@ int main(int argc, char** argv) {
 
   Threading::ThreadPool pool(threadsNumber);
   std::vector<std::shared_ptr<GraphAbcFolder>> folder;
+
+  auto start = high_resolution_clock::now();
 
   if (json_path.size()) {
     // json_path = "../examples/json/sampleALU.json";
@@ -207,6 +217,11 @@ int main(int argc, char** argv) {
   }
 
   pool.wait();
+
+  auto stop = high_resolution_clock::now();
+  auto duration = duration_cast<microseconds>(stop - start);
+  std::clog << "Time taken: " << duration.count() << " microseconds"
+            << std::endl;
 
   return 0;
 }
