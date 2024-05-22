@@ -120,9 +120,23 @@ class GraphAbcFolder {
       writeDataToJson(data, path, graph);
     }
   };
-  // lambda for Optimize
+  // lambda for Resyn2
   std::function<void()> callResyn2 = [this]() {
     auto res = AbcUtils::resyn2(graph, libName, path, libPath);
+
+    addData.lock();
+    data.push_back(res);
+    bool flag = data.size() == target;
+    addData.unlock();
+
+    if (flag) {
+      writeDataToJson(data, path, graph);
+    }
+  };
+  // lambda for main info
+  std::function<void()> callGetStats = [this]() {
+    auto res = AbcUtils::getStats(graph, libName, path, libPath);
+    res.commandsOutput["optimization_type"] = "Default";
 
     addData.lock();
     data.push_back(res);

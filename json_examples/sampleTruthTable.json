@@ -15,7 +15,7 @@
     "make_firrtl": true,
     "make_bench": true,
     "make_graphml": true,
-    "create_id_directories": true,
+    "create_id_directories": false,
     "library_name": "sky130",
     
     "CNFF": true,

@@ -13,7 +13,7 @@ include(FetchContent)
 FetchContent_Declare(
   OptimizationsVerilogLib
   GIT_REPOSITORY https://github.com/vvzunin/CircuitGen_Parameters
-  GIT_TAG 6e53957
+  GIT_TAG 0.5.1
 )
 FetchContent_MakeAvailable(OptimizationsVerilogLib)
 

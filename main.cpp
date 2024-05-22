@@ -14,16 +14,19 @@
 #include <vector>
 
 using namespace std::chrono;
+using recursive_directory_iterator =
+    std::filesystem::recursive_directory_iterator;
 
 #include "GraphAbcFolder.hpp"
 
 int main(int argc, char** argv) {
-  std::string json_path, file_path;
+  std::string jsonPath, filePath, directoryPath;
 
   bool makeBalanced = false;
   bool makeResyn2 = false;
   bool toBench = false;
   bool toFirrtl = false;
+  bool moveToFolder = false;
 
   uint8_t threadsNumber = 1;
 
@@ -32,12 +35,14 @@ int main(int argc, char** argv) {
   const std::string defaultLibPath = "tech_libs/";
   // Use getopt to parse command line arguments
 
-  const char* const short_opts = "ht:f:j:rbBFl:";
+  const char* const short_opts = "ht:f:j:rbd:mBFl:";
   const option long_opts[] = {{"json_path", required_argument, nullptr, 'j'},
                               {"file_path", required_argument, nullptr, 'f'},
                               {"threads", required_argument, nullptr, 't'},
                               {"make_resyn2", no_argument, nullptr, 'r'},
                               {"make_balance", no_argument, nullptr, 'b'},
+                              {"move", no_argument, nullptr, 'm'},
+                              {"directory", required_argument, nullptr, 'd'},
                               {"to_bench", no_argument, nullptr, 'B'},
                               {"to_firrtl", no_argument, nullptr, 'F'},
                               {"help", no_argument, nullptr, 'h'},
@@ -51,10 +56,13 @@ int main(int argc, char** argv) {
          -1) {
     switch (opt) {
       case 'j':
-        json_path = optarg;
+        jsonPath = optarg;
         break;
       case 'f':
-        file_path = optarg;
+        filePath = optarg;
+        break;
+      case 'd':
+        directoryPath = optarg;
         break;
       case 't':
         sub = atoi(optarg);
@@ -74,6 +82,9 @@ int main(int argc, char** argv) {
         break;
       case 'r':
         makeResyn2 = true;
+        break;
+      case 'm':
+        moveToFolder = true;
         break;
       case 'B':
         toBench = true;
@@ -98,6 +109,15 @@ int main(int argc, char** argv) {
         std::cout
             << "\t-f <path> or --file_path <path>:\n\t\tUsed for setting path "
                "to verilog file, should be proccessed by Berkeley-abc."
+            << std::endl;
+        std::cout
+            << "\t-d <directory> or --directory <directory>:\n\t\tUsed for setting dir "
+               "to many verilog files, should be proccessed by Berkeley-abc."
+            << std::endl;
+        std::cout
+            << "\t-m or --move:\n\t\tMove file to directory, where would be "
+               "moved verilog file \n\t\tand where would be located created by "
+               "abc files. \n\t\tUsage only with flag -d, default false"
             << std::endl;
         std::cout
             << "\t-b or --make_balance:\n\t\tRuns Berkeley-abc to optimize "
@@ -140,8 +160,8 @@ int main(int argc, char** argv) {
     }
   }
 
-  // if both are not emply
-  if (!json_path.empty() && !file_path.empty()) {
+  // if all are not emply
+  if (!jsonPath.empty() && !filePath.empty() && !directoryPath.empty()) {
     std::cerr << "Not allowed to use at the same time path to verilog file and "
                  "to json."
               << std::endl;
@@ -150,54 +170,16 @@ int main(int argc, char** argv) {
 
   Threading::ThreadPool pool(threadsNumber);
   std::vector<std::shared_ptr<GraphAbcFolder>> folder;
+  // we always have one function to calc start stats
+  int funcCount = ((int)makeBalanced) + ((int)makeResyn2) + 1;
 
-  auto start = high_resolution_clock::now();
-
-  if (json_path.size()) {
-    // json_path = "../examples/json/sampleALU.json";
-    std::vector<std::pair<std::string, std::vector<std::string>>> allRes =
-        CircuitGenGenerator::runGenerationFromJsonForPath(json_path);
-
-    if (!(makeResyn2 || makeBalanced || toBench || toFirrtl)) {
-      return 0;
-    }
-
-    for (auto [main_path, allGraphs] : allRes) {
-      for (auto graph : allGraphs) {
-        std::string path = main_path + "/" + graph;
-
-        std::shared_ptr<GraphAbcFolder> ptr(
-            new GraphAbcFolder(path, graph, libName, defaultLibPath,
-                               ((int)makeBalanced) + ((int)makeResyn2)));
-        folder.push_back(ptr);
-
-        if (makeBalanced) {
-          pool.submit((*folder.back()).callOptimize);
-        }
-
-        if (makeResyn2) {
-          pool.submit((*folder.back()).callResyn2);
-        }
-
-        if (toBench) {
-          pool.submit((*folder.back()).callToBench);
-        }
-
-        if (toFirrtl) {
-          pool.submit((*folder.back()).callToFirrtl);
-        }
-      }
-    }
-  }
-  // used for parsing one file
-  else if (makeResyn2 || makeBalanced || toBench || toFirrtl) {
-    std::string graph = std::filesystem::path(file_path).stem();
-    std::string path = std::filesystem::path(file_path).parent_path();
-
+  auto runInMultithread = [&](std::string path, std::string graph) {
     std::shared_ptr<GraphAbcFolder> ptr(
         new GraphAbcFolder(path, graph, libName, defaultLibPath,
-                           ((int)makeBalanced) + ((int)makeResyn2)));
+                           funcCount));
     folder.push_back(ptr);
+
+    pool.submit((*folder.back()).callGetStats);
 
     if (makeBalanced) {
       pool.submit((*folder.back()).callOptimize);
@@ -213,6 +195,55 @@ int main(int argc, char** argv) {
 
     if (toFirrtl) {
       pool.submit((*folder.back()).callToFirrtl);
+    }
+  };
+
+  auto start = high_resolution_clock::now();
+
+  if (jsonPath.size()) {
+    // jsonPath = "../examples/json/sampleALU.json";
+    std::vector<std::pair<std::string, std::vector<std::string>>> allRes =
+        CircuitGenGenerator::runGenerationFromJsonForPath(jsonPath);
+
+    if (!(makeResyn2 || makeBalanced || toBench || toFirrtl)) {
+      return 0;
+    }
+
+    for (auto [main_path, allGraphs] : allRes) {
+      for (auto graph : allGraphs) {
+        std::string path = main_path + "/" + graph;
+
+        runInMultithread(path, graph);
+      }
+    }
+  }
+  // used for parsing one file or dir
+  else if (makeResyn2 || makeBalanced || toBench || toFirrtl) {
+    if (filePath.size()) {
+      std::string graph = std::filesystem::path(filePath).stem();
+      std::string path = std::filesystem::path(filePath).parent_path();
+
+      runInMultithread(path, graph);
+    }
+
+    else {
+      for (const auto& dirEntry : recursive_directory_iterator(directoryPath)) {
+        if (!dirEntry.is_directory()) {
+          const auto file = std::filesystem::canonical(dirEntry);
+          auto filePath = file;
+
+          if (file.extension() == ".v") {
+            if (moveToFolder) {
+              std::filesystem::create_directory(file.parent_path() / file.stem());
+
+              filePath = file.parent_path() / file.stem() / file.filename();
+              std::filesystem::rename(file, filePath);
+            }
+
+            runInMultithread(filePath.parent_path(), filePath.stem());
+          }
+        }
+      }
     }
   }
 
