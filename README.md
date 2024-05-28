@@ -23,7 +23,12 @@
 
 Программа запускалась на Ubuntu 22.04 с использованием WSL (Windows Subsystem for Linux).
 
-[&#8593; Contents](#content_rus)
+## Установка утилит
+В первую очередь треубется установить все требуемые утилиты. Для этого выполните следующие команды: 
+```
+chmod +x installUtils.sh
+sudo ./installUtils.sh
+```
 
 ## Сборка проекта
 Для сборки требуется наличие cmake версии не ниже 3.14. Для сборки требуется выполнит следующие команды:
@@ -32,18 +37,39 @@ chmod +x buildGenerator.sh
 ./buildGenerator.sh
 ```
 После начнется установка дополнительных пакетов, требующихся для функционирования данной утилиты.
+
+## Backend + frontend
+<a name="backend_frontend_rus"></a> 
+### Установка
+<a name="install_rus"></a> 
+```
+pip install -r requirements.txt
+
+python manage.py migrate --run-syncdb
+cd frontend
+npm i
+npm run build
+cd ..
+```
+
 ## Запуск
-По окончании сборки исполняемый файл будет находиться в папке build и будет иметь имя `CicruitGen`. Для ознакомления с доступными командами вы можете использовать флаг -h или --help.
+<a name="run_rus"></a> 
+```
+python manage.py runserver
+```
+
+## Запуск
+По окончании сборки исполняемый файл будет находиться в папке Generator/build и будет иметь имя `CicruitGen`. Для ознакомления с доступными командами вы можете использовать флаг -h или --help.
 
 ```
-./build/CicruitGen --help
+./Generator/build/CircuitGen --help
 ```
 
 ## Пример запуска генератора 
 Далее будет дан пример запуска генератора с последующим созданием bench файла, а также файлов, оптимизированных с помощью алгоритма resyn2.
 
 ```
-./build/CicruitGen -j "json_examples/sampleTruthTable.json" -r -B
+./Generator/build/CircuitGen -j json_examples/sampleTruthTable.json -r -B
 ```
 
 # Текущий датасет

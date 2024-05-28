@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 
   std::string libName = "sky130.lib";
 
-  const std::string defaultLibPath = "tech_libs/";
+  const std::string defaultLibPath = "Generator/tech_libs/";
   // Use getopt to parse command line arguments
 
   const char* const short_opts = "ht:f:j:rbd:mBFl:";

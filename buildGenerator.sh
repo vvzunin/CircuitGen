@@ -1,6 +1,7 @@
 #!/bin/bash
-if [ ! -d "build" ]; then
-  mkdir build
+if [ ! -d "Generator/build" ]; then
+  mkdir Generator/build
 fi
-cmake -S . -B build -G "Unix Makefiles"
-cmake --build build -j $(nproc)
+
+cmake -S . -B Generator/build -G "Unix Makefiles"
+cmake --build Generator/build -j $(nproc)

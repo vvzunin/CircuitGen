@@ -1,9 +1,9 @@
 #!/bin/bash
-if [ ! -d "build" ]; then
-  mkdir build
+if [ ! -d "Generator/build" ]; then
+  mkdir Generator/build
 fi
  
-cd build
+cd Generator/build
 cmake ..
 cmake --build . -j $(nproc) 
 
