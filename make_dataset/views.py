@@ -132,7 +132,7 @@ def upload_to_synology(dataset_id):
     with SynologyDrive(NAS_USER, NAS_PASS, NAS_IP, NAS_PORT, dsm_version=dsm_version) as synd:
         dataset_id = str(dataset_id)
         dataset_dir = f'./dataset/{dataset_id}'
-        extension_lst = ['.v', '.aig', '.json', '.png']
+        extension_lst = ['.v', '.aig', '.json', '.png', '.bench']
 
         for param in os.listdir(dataset_dir):
             # looking for subdirectiries
