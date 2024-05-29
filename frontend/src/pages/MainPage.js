@@ -112,14 +112,14 @@ const MainPage = () => {
 				"bench": bench,
 				"firrtl": firrtl
 			};
+			var res = {"id": selectedParameters};
+			res["flags"] = flags;
 
-			// selectedParameters["flags"] = flags;
-
-			console.log(selectedParameters);
+			console.log(res);
 			axios({
-				method: 'post', 
-				url: `http://127.0.0.1:8000/api/add_dataset`, 
-				data: selectedParameters
+				method: 'post',
+				url: `http://127.0.0.1:8000/api/add_dataset`,
+				data: res
 			})
 				// .then(() => {
 				// 	alert('Параметры успешно отправлены на генерацию!');
