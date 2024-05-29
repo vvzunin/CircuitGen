@@ -8,11 +8,16 @@ import TruthTable from '../components/TruthTable';
 import RandLevel from '../components/RandLevel';
 import NumOperations from '../components/NumOperations';
 import Genetic from '../components/Genetic';
+import Subtractor from '../components/Subtractor';
+import Summator from '../components/Summator';
+import Comparison from '../components/Comparsion';
 import TextField from '../components/TextField';
 
 import dice from '../assets/dice.svg';
 
-const data = ['From Random Truth Table', 'Rand Level', 'Num Operation', 'Genetic'];
+const data = ['From Random Truth Table', 'Rand Level', 'Num Operation', 
+              'Genetic', 'Comparison', 'Subtractor', 'Summator', 'Decoder', 
+              'Demultiplexer', 'Multiplexer', 'Multiplier', 'Parity'];
 const genetic = ['Genetic reproduction', 'Genetic mutation', 'Genetic selection'];
 
 const INT_MAX = 2147483647;
@@ -149,6 +154,13 @@ const AddParameter = () => {
     numXor: 0,
     numXnor: 0,
     leaveEmptyOut: false,
+    overflowIn: true,
+    overflowOut: true,
+    minus: false,
+    sub: false,
+    equal: true,
+    less: false,
+    more: false,
   });
 
   const {
@@ -193,6 +205,13 @@ const AddParameter = () => {
     numXor,
     numXnor,
     leaveEmptyOut,
+    overflowIn,
+    overflowOut,
+    minus,
+    sub,
+    equal,
+    less,
+    more,
   } = state;
 
   const updateState = (key, value) => {
@@ -218,6 +237,13 @@ const AddParameter = () => {
     sendData.multithread = multithread;
     sendData.CNFF = CNFF;
     sendData.CNFT = CNFT;
+    sendData.equal = equal;
+    sendData.less = less;
+    sendData.more = more;
+    sendData.overflowIn = overflowIn;
+    sendData.overflowOut = overflowOut;
+    sendData.minus = minus;
+    sendData.sub = sub;
     sendData.Zhegalkin = Zhegalkin;
     sendData.min_level = minLevel;
     sendData.max_level = maxLevel;
@@ -398,6 +424,9 @@ const AddParameter = () => {
               ratio={ratio}
               survNum={survNum}
             />}
+            {generationMethod === 4 && <Comparison state={state} updateState={updateState} />}
+            {generationMethod === 5 && <Subtractor state={state} updateState={updateState} />}
+            {generationMethod === 6 && <Summator state={state} updateState={updateState} />}
           </div>
         </Form>
       )}

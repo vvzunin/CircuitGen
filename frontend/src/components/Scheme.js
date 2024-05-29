@@ -36,6 +36,21 @@ const Scheme = ({data}) => {
                     <li>CNFT: {data.CNFT ? "true" : "false"}</li>
                     <li>Zhegalkin: {data.Zhegalkin ? "true" : "false"}</li>
                 </>}
+                {data.type_of_generation === "Comparison" && <>
+                    <li>equal: {data.equal ? "true" : "false"}</li>
+                    <li>less: {data.less ? "true" : "false"}</li>
+                    <li>more: {data.more ? "true" : "false"}</li>
+                </>}
+                {data.type_of_generation === "Subtractor" && <>
+                    <li>overflowIn: {data.overflowIn ? "true" : "false"}</li>
+                    <li>overflowOut: {data.overflowOut ? "true" : "false"}</li>
+                    <li>sub: {data.sub ? "true" : "false"}</li>
+                </>}
+                {data.type_of_generation === "Summator" && <>
+                    <li>overflowIn: {data.overflowIn ? "true" : "false"}</li>
+                    <li>overflowOut: {data.overflowOut ? "true" : "false"}</li>
+                    <li>minus: {data.minus ? "true" : "false"}</li>
+                </>}
                 {data.type_of_generation === "Rand Level" && <>
                     <li>Минимальное количество уровней: {data.min_level}</li>
                     <li>Максимальное количество уровней: {data.max_level}</li>

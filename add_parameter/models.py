@@ -10,6 +10,14 @@ class AddParameter(models.Model):
         ("Genetic reproduction", "Genetic reproduction"),
         ("Genetic mutation", "Genetic mutation"),
         ("Genetic selection", "Genetic selection"),
+        ("Comparison", "Comparison"),
+        ("Subtractor", "Subtractor"),
+        ("Summator", "Summator"),
+        ("Decoder", "Decoder"),
+        ("Demultiplexer", "Demultiplexer"),
+        ("Multiplier", "Multiplier"),
+        ("Multiplexer", "Multiplexer"),
+        ("Parity", "Parity"),
     ), verbose_name='Метод генерации')
 
     min_in = models.IntegerField(default=1, verbose_name='Минимальное количество входов')
@@ -19,9 +27,19 @@ class AddParameter(models.Model):
     repeat_n = models.IntegerField(default=1, verbose_name='Количество повторений каждой комбинации')
     seed = models.IntegerField(default=-1, verbose_name='Сид генерации')
     multithread = models.IntegerField(default=1, verbose_name='Число потоков')
+    
     CNFF = models.BooleanField(default=0, verbose_name='CNFF')
     CNFT = models.BooleanField(default=0, verbose_name='CNFT')
     Zhegalkin = models.BooleanField(default=0, verbose_name='Zhegalkin')
+    
+    overflowIn = models.BooleanField(default=0, verbose_name='overflowIn')
+    overflowOut = models.BooleanField(default=0, verbose_name='overflowOut')
+    minus = models.BooleanField(default=0, verbose_name='minus')
+    sub = models.BooleanField(default=0, verbose_name='sub')
+    
+    equal = models.BooleanField(default=0, verbose_name='equal')
+    less = models.BooleanField(default=0, verbose_name='less')
+    more = models.BooleanField(default=0, verbose_name='more')
 
     min_level = models.IntegerField(default=1, verbose_name='Минимальное количество уровней')
     max_level = models.IntegerField(default=1, verbose_name='Максимальное количество уровней')

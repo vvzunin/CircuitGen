@@ -55,6 +55,21 @@ const Parameter = ({ dataItem, deleteParameter, selectedParameters, setSelectedP
                         <li>CNFT: {dataItem.CNFT ? "true" : "false"}</li>
                         <li>Zhegalkin: {dataItem.Zhegalkin ? "true" : "false"}</li>
                     </>}
+                    {dataItem.type_of_generation === "Comparison" && <>
+                        <li>equal: {dataItem.equal ? "true" : "false"}</li>
+                        <li>less: {dataItem.less ? "true" : "false"}</li>
+                        <li>more: {dataItem.more ? "true" : "false"}</li>
+                    </>}
+                    {dataItem.type_of_generation === "Subtractor" && <>
+                        <li>overflowIn: {dataItem.overflowIn ? "true" : "false"}</li>
+                        <li>overflowOut: {dataItem.overflowOut ? "true" : "false"}</li>
+                        <li>sub: {dataItem.sub ? "true" : "false"}</li>
+                    </>}
+                    {dataItem.type_of_generation === "Summator" && <>
+                        <li>overflowIn: {dataItem.overflowIn ? "true" : "false"}</li>
+                        <li>overflowOut: {dataItem.overflowOut ? "true" : "false"}</li>
+                        <li>minus: {dataItem.minus ? "true" : "false"}</li>
+                    </>}
                     {dataItem.type_of_generation === "Rand Level" && <>
                         <li>Минимальное количество уровней: {dataItem.min_level}</li>
                         <li>Максимальное количество уровней: {dataItem.max_level}</li>

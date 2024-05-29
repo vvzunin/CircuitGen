@@ -146,7 +146,7 @@ const MainPage = () => {
 				<div className="content__right-link">
 					<h3>Параметры генерации</h3>
 				</div>
-				<div className="content pb75">
+				<div className="content pb215">
 					{
 						!isLoading && (generatorParameters?.length == 0) && <Link to='/add' className="content__new">Создать параметр генерации<img src={plus} /></Link>
 					}

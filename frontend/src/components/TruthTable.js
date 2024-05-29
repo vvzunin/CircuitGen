@@ -1,10 +1,6 @@
 import ToggleSwitchFilter from "./ToggleSwitch";
 
 const TruthTable = ({updateState, state}) => {
-
-    const changeLimit = (limit) => {
-      // updateState('limit', limit)
-    }
   
     const changeCNFF = (CNFF) => {
       if (!CNFF) {
