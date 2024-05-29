@@ -48,13 +48,16 @@ const Parameter = ({dataItem, deleteParameter, selectedParameters, setSelectedPa
                 <li>Максимальное количество выходов: {dataItem.max_out}</li>
                 <li>Количество повторений каждой комбинации: {dataItem.repeat_n}</li>
                 <li>Сид генерации: {dataItem.seed}</li>
+                <li>Число потоков: {dataItem.multithread}</li>
                 {dataItem.type_of_generation === "From Random Truth Table" && <>
                     <li>Ограничение генерации: {dataItem.limit ? "true" : "false"}</li>
                     <li>CNFF: {dataItem.CNFF ? "true" : "false"}</li>
                     <li>CNFT: {dataItem.CNFT ? "true" : "false"}</li>
                 </>}
                 {dataItem.type_of_generation === "Rand Level" && <>
+                    <li>Минимальное количество уровней: {dataItem.min_level}</li>
                     <li>Максимальное количество уровней: {dataItem.max_level}</li>
+                    <li>Минимальное количество элементов: {dataItem.min_elem}</li>
                     <li>Максимальное количество элементов: {dataItem.max_elem}</li>
                 </>}
                 {dataItem.type_of_generation === "Num Operation" && <>

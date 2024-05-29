@@ -29,13 +29,16 @@ const Scheme = ({data}) => {
                 <li>Максимальное количество выходов: {data.max_out}</li>
                 <li>Количество повторений каждой комбинации: {data.repeat_n}</li>
                 <li>Сид генерации: {data.seed}</li>
+                <li>Число потоков: {data.multithread}</li>
                 {data.type_of_generation === "From Random Truth Table" && <>
                     <li>Ограничение генерации: {data.limit ? "true" : "false"}</li>
                     <li>CNFF: {data.CNFF ? "true" : "false"}</li>
                     <li>CNFT: {data.CNFT ? "true" : "false"}</li>
                 </>}
                 {data.type_of_generation === "Rand Level" && <>
+                    <li>Минимальное количество уровней: {data.min_level}</li>
                     <li>Максимальное количество уровней: {data.max_level}</li>
+                    <li>Минимальное количество элементов: {data.min_elem}</li>
                     <li>Максимальное количество элементов: {data.max_elem}</li>
                 </>}
                 {data.type_of_generation === "Num Operation" && <>
