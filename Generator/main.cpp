@@ -5,6 +5,7 @@
 #include <CircuitGenGenerator/CircuitGenGenerator.hpp>
 #include <CircuitGenGenerator/ThreadPool.hpp>
 #include <YosysUtils.hpp>
+
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -111,7 +112,8 @@ int main(int argc, char** argv) {
                "to verilog file, should be proccessed by Berkeley-abc."
             << std::endl;
         std::cout
-            << "\t-d <directory> or --directory <directory>:\n\t\tUsed for setting dir "
+            << "\t-d <directory> or --directory <directory>:\n\t\tUsed for "
+               "setting dir "
                "to many verilog files, should be proccessed by Berkeley-abc."
             << std::endl;
         std::cout
@@ -175,8 +177,7 @@ int main(int argc, char** argv) {
 
   auto runInMultithread = [&](std::string path, std::string graph) {
     std::shared_ptr<GraphAbcFolder> ptr(
-        new GraphAbcFolder(path, graph, libName, defaultLibPath,
-                           funcCount));
+        new GraphAbcFolder(path, graph, libName, defaultLibPath, funcCount));
     folder.push_back(ptr);
 
     pool.submit((*folder.back()).callGetStats);
@@ -234,7 +235,8 @@ int main(int argc, char** argv) {
 
           if (file.extension() == ".v") {
             if (moveToFolder) {
-              std::filesystem::create_directory(file.parent_path() / file.stem());
+              std::filesystem::create_directory(file.parent_path() /
+                                                file.stem());
 
               filePath = file.parent_path() / file.stem() / file.filename();
               std::filesystem::rename(file, filePath);

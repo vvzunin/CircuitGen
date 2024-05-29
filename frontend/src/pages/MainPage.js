@@ -106,8 +106,21 @@ const MainPage = () => {
 
 	const addDataset = () => {
 		if (selectedParameters.length > 0) {
+			var flags = {
+				"resyn2": resyn2,
+				"balance": balance,
+				"bench": bench,
+				"firrtl": firrtl
+			};
+
+			// selectedParameters["flags"] = flags;
+
 			console.log(selectedParameters);
-			axios.post(`http://127.0.0.1:8000/api/add_dataset`, selectedParameters)
+			axios({
+				method: 'post', 
+				url: `http://127.0.0.1:8000/api/add_dataset`, 
+				data: selectedParameters
+			})
 				// .then(() => {
 				// 	alert('Параметры успешно отправлены на генерацию!');
 				// 	getDatasets();

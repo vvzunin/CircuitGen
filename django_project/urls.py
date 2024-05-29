@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 from make_dataset import views
-from make_dataset.views import *
 # from backend.views import front
 from .views import front
 from add_parameter.views import *
@@ -11,7 +10,7 @@ from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(r'add_parameter', AddParameterAPISet)
-router.register(r'datasets', DatasetList)
+router.register(r'datasets', views.DatasetList)
 
 urlpatterns = [
     path('', front, name="front"),

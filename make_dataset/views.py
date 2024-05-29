@@ -2,8 +2,11 @@ import pathlib
 import random
 import subprocess
 
+from time import sleep
+
 from django.http import JsonResponse
 from django.http import HttpResponse
+from django.http import HttpRequest
 from add_parameter.views import *
 import json
 
@@ -27,12 +30,14 @@ class DatasetList(viewsets.ModelViewSet):
     serializer_class = DatasetSerializer
 
 
-def add_dataset(request):
-
+def add_dataset(request: HttpRequest):
     print("add_dataset is running")
     # добавить датасет в базу данных
     [dataset_id, parameters_of_generation] = add_dataset_to_database(request)
     print("add_dataset_to_database is finished")
+    
+    print(request.POST, request.body, request.read(), parameters_of_generation)
+    return HttpResponse("Ok")
 
     # запуск генератора
     run_generator(parameters_of_generation, dataset_id)
@@ -47,7 +52,7 @@ def add_dataset(request):
     print("upload_to_synology is finished")
 
     # удалить локальную папку с датасетом
-    # delete_folders(dataset_id)
+    delete_folders(dataset_id)
     print("delete_folders is finished")
 
     print("add_dataset is finished")
@@ -151,9 +156,10 @@ def upload_to_synology(dataset_id):
                                 file_name = os.path.basename(file_path)
                                 bfile = io.BytesIO(file.read())
                                 bfile.name = f'{dataset_id}/{sub_path}/{file_name}'
+                                
                                 synd.upload_file(
                                     bfile,
-                                    dest_folder_path=f'/team-folders/circuits/datasets/'
+                                    dest_folder_path=f'/team-folders/circuits/datasets/test_send/'
                                 )
                         except Exception as e:
                             print(e)
@@ -180,11 +186,11 @@ def delete_folders(dataset_id):
         print("Error: %s - %s." % (e.filename, e.strerror))
 
 
-def add_dataset_to_database(request):
+def add_dataset_to_database(request: HttpRequest):
     # получаем список id параметров генерации, по которым будем делать датасет
     test = request.body.decode('utf-8')
     if len(list(test)) != 0:
-        id_of_parameters_of_generation = json.loads(request.body.decode('utf-8'))
+        id_of_parameters_of_generation = json.loads(test)
     else:
         id_of_parameters_of_generation = []
 

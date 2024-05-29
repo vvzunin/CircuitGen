@@ -18,11 +18,14 @@ class AddParameter(models.Model):
     max_out = models.IntegerField(default=1, verbose_name='Максимальное количество выходов')
     repeat_n = models.IntegerField(default=1, verbose_name='Количество повторений каждой комбинации')
     seed = models.IntegerField(default=-1, verbose_name='Сид генерации')
+    multithread = models.IntegerField(default=1, verbose_name='Число потоков')
     CNFF = models.BooleanField(default=0, verbose_name='CNFF')
     CNFT = models.BooleanField(default=0, verbose_name='CNFT')
 
+    min_level = models.IntegerField(default=1, verbose_name='Минимальное количество уровней')
     max_level = models.IntegerField(default=1, verbose_name='Максимальное количество уровней')
-    max_elem = models.IntegerField(default=0, verbose_name='Максимальное количество элементов')
+    min_elem = models.IntegerField(default=1, verbose_name='Минимальное количество элементов')
+    max_elem = models.IntegerField(default=1, verbose_name='Максимальное количество элементов')
 
     leave_empty_out = models.BooleanField(default=0, verbose_name='Оставлять пустые выходы')
     num_and = models.IntegerField(default=0)
