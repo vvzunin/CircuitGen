@@ -34,6 +34,7 @@ const Scheme = ({data}) => {
                     <li>Ограничение генерации: {data.limit ? "true" : "false"}</li>
                     <li>CNFF: {data.CNFF ? "true" : "false"}</li>
                     <li>CNFT: {data.CNFT ? "true" : "false"}</li>
+                    <li>Zhegalkin: {data.Zhegalkin ? "true" : "false"}</li>
                 </>}
                 {data.type_of_generation === "Rand Level" && <>
                     <li>Минимальное количество уровней: {data.min_level}</li>

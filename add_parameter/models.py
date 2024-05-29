@@ -21,6 +21,7 @@ class AddParameter(models.Model):
     multithread = models.IntegerField(default=1, verbose_name='Число потоков')
     CNFF = models.BooleanField(default=0, verbose_name='CNFF')
     CNFT = models.BooleanField(default=0, verbose_name='CNFT')
+    Zhegalkin = models.BooleanField(default=0, verbose_name='Zhegalkin')
 
     min_level = models.IntegerField(default=1, verbose_name='Минимальное количество уровней')
     max_level = models.IntegerField(default=1, verbose_name='Максимальное количество уровней')

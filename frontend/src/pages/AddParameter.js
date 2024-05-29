@@ -119,6 +119,7 @@ const AddParameter = () => {
     limit: false,
     CNFF: true,
     CNFT: true,
+    Zhegalkin: true,
     minLevel: 1,
     maxLevel: 1,
     minElem: 1,
@@ -162,11 +163,11 @@ const AddParameter = () => {
     multithread,
     CNFF,
     CNFT,
+    Zhegalkin,
     minLevel,
     maxLevel,
     minElem,
     maxElem,
-    runResyn2,
     population,
     cycles,
     uOut,
@@ -217,6 +218,7 @@ const AddParameter = () => {
     sendData.multithread = multithread;
     sendData.CNFF = CNFF;
     sendData.CNFT = CNFT;
+    sendData.Zhegalkin = Zhegalkin;
     sendData.min_level = minLevel;
     sendData.max_level = maxLevel;
     sendData.min_elem = minElem;
