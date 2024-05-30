@@ -16,7 +16,7 @@ import TextField from '../components/TextField';
 import dice from '../assets/dice.svg';
 
 const data = ['From Random Truth Table', 'Rand Level', 'Num Operation', 
-              'Genetic', 'Comparison', 'Subtractor', 'Summator', 'Decoder', 
+              'Genetic', 'Comparison', 'Subtractor', 'Summator', 'Decoder', 'Encoder',
               'Demultiplexer', 'Multiplexer', 'Multiplier', 'Parity'];
 const genetic = ['Genetic reproduction', 'Genetic mutation', 'Genetic selection'];
 

@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(OptimizationsVerilogLib)
 FetchContent_Declare(
   CircuitGen_Generator
   GIT_REPOSITORY https://github.com/vvzunin/CircuitGen_Generator
-  GIT_TAG e964e09
+  GIT_TAG 94861e875
 )
 FetchContent_MakeAvailable(CircuitGen_Generator)
 

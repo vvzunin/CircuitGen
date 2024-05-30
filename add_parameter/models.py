@@ -14,6 +14,7 @@ class AddParameter(models.Model):
         ("Subtractor", "Subtractor"),
         ("Summator", "Summator"),
         ("Decoder", "Decoder"),
+        ("Encoder", "Encoder"),
         ("Demultiplexer", "Demultiplexer"),
         ("Multiplier", "Multiplier"),
         ("Multiplexer", "Multiplexer"),
