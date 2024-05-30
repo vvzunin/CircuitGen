@@ -18,7 +18,9 @@ import dice from '../assets/dice.svg';
 const data = ['From Random Truth Table', 'Rand Level', 'Num Operation', 
               'Genetic', 'Comparison', 'Subtractor', 'Summator', 'Decoder', 'Encoder',
               'Demultiplexer', 'Multiplexer', 'Multiplier', 'Parity'];
-const genetic = ['Genetic reproduction', 'Genetic mutation', 'Genetic selection'];
+// TODO what to do with it
+// const genetic = ['Genetic reproduction', 'Genetic mutation', 'Genetic selection'];
+const genetic = ['Genetic', 'Genetic', 'Genetic'];
 
 const INT_MAX = 2147483647;
 const UINT_MAX = 4294967295;
