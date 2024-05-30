@@ -34,7 +34,7 @@ sudo ./installUtils.sh
 
 ### Debian-like os
 ```
-sudo apt install cmake g++ npm
+sudo apt install cmake g++ npm graphviz python3 python3-pip doxygen
 ```
 
 ## Сборка проекта
