@@ -52,7 +52,7 @@ chmod +x buildGenerator.sh
 ```
 pip install -r requirements.txt
 
-python manage.py migrate --run-syncdb
+python server/manage.py migrate --run-syncdb
 cd frontend
 npm i
 npm run build
@@ -62,7 +62,7 @@ cd ..
 ## Запуск
 <a name="run_rus"></a> 
 ```
-python manage.py runserver
+python server/manage.py runserver
 ```
 
 ## Запуск генератора с помощью командной строки
