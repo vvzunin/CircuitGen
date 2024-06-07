@@ -9,7 +9,10 @@
     
 # Состав программы
 <a name="modules_rus"></a> 
-Программа состоит из нескольких основных модулей.
+Программа состоит из нескольких основных модулей:
+- [Generator](https://github.com/vvzunin/CircuitGen_Generator) - генератор цифровых схем;
+- [Generator](https://github.com/vvzunin/CircuitGen_Parameters) - расчет различных параметров цифровых схем;
+- [Generator](https://github.com/vvzunin/CircuitGen_AI) - набор методов машинного обучения для оценки параметров цифровых схем.
 
 [&#8593; Contents](#content_rus)
 
