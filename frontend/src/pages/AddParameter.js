@@ -5,6 +5,7 @@ import { Formik, Form, Field, ErrorMessage, useField } from 'formik';
 import * as Yup from 'yup';
 
 import TruthTable from '../components/TruthTable';
+import GraphML from '../components/GraphML';
 import RandLevel from '../components/RandLevel';
 import NumOperations from '../components/NumOperations';
 import Genetic from '../components/Genetic';
@@ -15,9 +16,9 @@ import TextField from '../components/TextField';
 
 import dice from '../assets/dice.svg';
 
-const data = ['From Random Truth Table', 'Rand Level', 'Num Operation', 
-              'Genetic', 'Comparison', 'Subtractor', 'Summator', 'Decoder', 'Encoder',
-              'Demultiplexer', 'Multiplexer', 'Multiplier', 'Parity'];
+const data = ['From Random Truth Table', 'Rand Level', 'Num Operation',
+  'Genetic', 'Comparison', 'Subtractor', 'Summator', 'Decoder', 'Encoder',
+  'Demultiplexer', 'Multiplexer', 'Multiplier', 'Parity'];
 // TODO what to do with it
 // const genetic = ['Genetic reproduction', 'Genetic mutation', 'Genetic selection'];
 const genetic = ['Genetic', 'Genetic', 'Genetic'];
@@ -123,6 +124,9 @@ const AddParameter = () => {
     repeats: 1,
     seed: -1,
     multithread: 1,
+    make_graphml_classic: false,
+    make_graphml_pseudo_abc_d: false,
+    make_graphml_open_abc_d: false,
     limit: false,
     CNFF: true,
     CNFT: true,
@@ -175,6 +179,9 @@ const AddParameter = () => {
     repeats,
     seed,
     multithread,
+    make_graphml_classic,
+    make_graphml_pseudo_abc_d,
+    make_graphml_open_abc_d,
     CNFF,
     CNFT,
     Zhegalkin,
@@ -217,10 +224,15 @@ const AddParameter = () => {
   } = state;
 
   const updateState = (key, value) => {
-    setState(prevState => ({
-      ...prevState,
-      [key]: value,
-    }));
+    setState(prevState => {
+      let x = (
+        {
+          ...prevState,
+          [key]: value,
+        }
+      );
+      return x;
+    });
   };
 
   const addParameter = () => {
@@ -237,6 +249,9 @@ const AddParameter = () => {
     sendData.repeat_n = repeats;
     sendData.seed = seed;
     sendData.multithread = multithread;
+    sendData.make_graphml_classic = make_graphml_classic;
+    sendData.make_graphml_pseudo_abc_d = make_graphml_pseudo_abc_d;
+    sendData.make_graphml_open_abc_d = make_graphml_open_abc_d;
     sendData.CNFF = CNFF;
     sendData.CNFT = CNFT;
     sendData.equal = equal;
@@ -276,7 +291,6 @@ const AddParameter = () => {
     sendData.num_xor = numXor;
     sendData.num_xnor = numXnor;
     sendData.leave_empty_out = leaveEmptyOut;
-
 
     console.log(sendData);
 
@@ -397,7 +411,13 @@ const AddParameter = () => {
                 name="multithread"
                 min={1}
               />
+              {/* <TextField 
+                label="Создать классический graphML"
+                type="checkbox"
+                name="make_graphml_classic"
+              /> */}
             </div>
+            { <GraphML state={state} updateState={updateState} /> }
             {generationMethod === 0 && <TruthTable state={state} updateState={updateState} />}
             {generationMethod === 1 && <RandLevel updateState={updateState} minLevel={minLevel} maxLevel={maxLevel} minElem={minElem} maxElem={maxElem} />}
             {generationMethod === 2 && <NumOperations

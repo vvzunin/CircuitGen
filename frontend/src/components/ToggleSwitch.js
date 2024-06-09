@@ -2,8 +2,7 @@ import React from 'react'
 import { useId } from "react-id-generator";
 
 
-const ToggleSwitchFilter = ({changeParentState, isChecked = false}) => {
-
+const ToggleSwitchFilter = ({changeParentState, isChecked = false, name = ""}) => {
 	const [htmlId] = useId();	
 
 	function changeCheckbox() {
@@ -12,8 +11,8 @@ const ToggleSwitchFilter = ({changeParentState, isChecked = false}) => {
 
 	return (
 	<div className="toggleSwitch">
-		<input type="checkbox" id={htmlId} checked={isChecked} onChange={changeCheckbox}/>
-        <label htmlFor={htmlId} className={isChecked ? "active" : ""}>Toggle</label>
+		<input id={name == "" ? htmlId : name} type="checkbox" checked={isChecked} onChange={changeCheckbox}/>
+        <label htmlFor={name == "" ? htmlId : name} className={isChecked ? "active" : ""}>Toggle</label>
 	</div>
 	)
 }

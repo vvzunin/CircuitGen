@@ -49,6 +49,9 @@ const Parameter = ({ dataItem, deleteParameter, selectedParameters, setSelectedP
                     <li>Количество повторений каждой комбинации: {dataItem.repeat_n}</li>
                     <li>Сид генерации: {dataItem.seed}</li>
                     <li>Число потоков: {dataItem.multithread}</li>
+                    <li>Создать классический graphML: {dataItem.make_graphml_classic ? "true" : "false"}</li>
+                    <li>Создать graphML для OpenABC-D: {dataItem.make_graphml_open_abc_d ? "true" : "false"}</li>
+                    <li>Создать урезанный graphML для OpenABC-D: {dataItem.make_graphml_pseudo_abc_d ? "true" : "false"}</li>
                     {dataItem.type_of_generation === "From Random Truth Table" && <>
                         <li>Ограничение генерации: {dataItem.limit ? "true" : "false"}</li>
                         <li>CNFF: {dataItem.CNFF ? "true" : "false"}</li>

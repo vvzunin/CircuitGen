@@ -30,6 +30,9 @@ const Scheme = ({data}) => {
                 <li>Количество повторений каждой комбинации: {data.repeat_n}</li>
                 <li>Сид генерации: {data.seed}</li>
                 <li>Число потоков: {data.multithread}</li>
+                <li>Создать классический graphML: {data.make_graphml_classic ? "true" : "false"}</li>
+                <li>Создать graphML для OpenABC-D: {data.make_graphml_open_abc_d ? "true" : "false"}</li>
+                <li>Создать урезанный graphML для OpenABC-D: {data.make_graphml_pseudo_abc_d ? "true" : "false"}</li>
                 {data.type_of_generation === "From Random Truth Table" && <>
                     <li>Ограничение генерации: {data.limit ? "true" : "false"}</li>
                     <li>CNFF: {data.CNFF ? "true" : "false"}</li>

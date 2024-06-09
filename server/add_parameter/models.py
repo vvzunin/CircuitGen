@@ -30,6 +30,10 @@ class AddParameter(models.Model):
     seed = models.IntegerField(default=-1, verbose_name='Сид генерации')
     multithread = models.IntegerField(default=1, verbose_name='Число потоков')
     
+    make_graphml_classic = models.BooleanField(default=0, verbose_name='Создать классический graphML')
+    make_graphml_open_abc_d = models.BooleanField(default=0, verbose_name='Создать graphML для OpenABC-D')
+    make_graphml_pseudo_abc_d = models.BooleanField(default=0, verbose_name='Создать урезанный graphML для OpenABC-D')
+    
     CNFF = models.BooleanField(default=0, verbose_name='CNFF')
     CNFT = models.BooleanField(default=0, verbose_name='CNFT')
     Zhegalkin = models.BooleanField(default=0, verbose_name='Zhegalkin')
