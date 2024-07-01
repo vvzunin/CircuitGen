@@ -19,6 +19,8 @@
 
 # **Единая системы генерации, хранения и обработки датасета цифровых схем** [CircuitGen]
 
+![Alt](https://repobeats.axiom.co/api/embed/393cee194e0d9302500fb5dc6551a537a5e49759.svg "Repobeats analytics image")
+
 <font size="5">**Содержание**:</font>
 <a name="content_rus"></a> 
 - [Состав программы](#modules_rus)
