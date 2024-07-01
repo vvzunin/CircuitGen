@@ -1,4 +1,4 @@
-# Генератор комбинационных схем
+# **Единая системы генерации, хранения и обработки датасета цифровых схем** [CircuitGen]
 
 ![License: MIT](https://img.shields.io/github/license/vvzunin/CircuitGen)
 ![GitHub forks](https://img.shields.io/github/forks/vvzunin/CircuitGen)
@@ -16,8 +16,6 @@
 
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/vvzunin/CircuitGen)
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-pr/vvzunin/CircuitGen)
-
-# **Единая системы генерации, хранения и обработки датасета цифровых схем** [CircuitGen]
 
 ![Alt](https://repobeats.axiom.co/api/embed/393cee194e0d9302500fb5dc6551a537a5e49759.svg "Repobeats analytics image")
 
