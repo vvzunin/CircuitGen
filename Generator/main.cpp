@@ -14,11 +14,11 @@
 #include <string>
 #include <vector>
 
+#include "GraphAbcFolder.hpp"
+
 using namespace std::chrono;
 using recursive_directory_iterator =
     std::filesystem::recursive_directory_iterator;
-
-#include "GraphAbcFolder.hpp"
 
 int main(int argc, char** argv) {
   std::string jsonPath, filePath, directoryPath;

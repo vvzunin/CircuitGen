@@ -1,3 +1,22 @@
+# Генератор комбинационных схем
+
+![License: MIT](https://img.shields.io/github/license/vvzunin/CircuitGen)
+![GitHub forks](https://img.shields.io/github/forks/vvzunin/CircuitGen)
+![GitHub Repo stars](https://img.shields.io/github/stars/vvzunin/CircuitGen)
+![GitHub watchers](https://img.shields.io/github/watchers/vvzunin/CircuitGen)
+
+![GitHub CI](https://github.com/vvzunin/CircuitGen/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/vvzunin/CircuitGen/graph/badge.svg?token=U88U82QFX8)](https://codecov.io/gh/vvzunin/CircuitGen)
+![GitHub Release](https://img.shields.io/github/v/release/vvzunin/CircuitGen)
+![GitHub Release Date](https://img.shields.io/github/release-date/vvzunin/CircuitGen)
+
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/vvzunin/CircuitGen)
+![GitHub commits since latest release](https://img.shields.io/github/commits-since/vvzunin/CircuitGen/latest)
+![GitHub last commit](https://img.shields.io/github/last-commit/vvzunin/CircuitGen)
+
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/vvzunin/CircuitGen)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-pr/vvzunin/CircuitGen)
+
 # **Единая системы генерации, хранения и обработки датасета цифровых схем** [CircuitGen]
 
 <font size="5">**Содержание**:</font>
@@ -10,6 +29,7 @@
 # Состав программы
 <a name="modules_rus"></a> 
 Программа состоит из нескольких основных модулей:
+- [Graph](https://github.com/vvzunin/CircuitGen_Graph) - графовое представление цифровых схем;
 - [Generator](https://github.com/vvzunin/CircuitGen_Generator) - генератор цифровых схем;
 - [Parameters](https://github.com/vvzunin/CircuitGen_Parameters) - расчет различных параметров цифровых схем;
 - [AI](https://github.com/vvzunin/CircuitGen_AI) - набор методов машинного обучения для оценки параметров цифровых схем.
