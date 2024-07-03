@@ -2,7 +2,7 @@ import pathlib
 import random
 import subprocess
 
-from time import sleep
+from dotenv import load_dotenv
 
 from django.http import JsonResponse
 from django.http import HttpResponse
@@ -148,8 +148,10 @@ def in_total_function(obj):
 
 
 def upload_to_synology(dataset_id):
+    load_dotenv()
+    
     NAS_USER = 'project1290'
-    NAS_PASS = '~.*{*$7]NJ1[pS`\\'
+    NAS_PASS = os.getenv("NAS_PASS", "NOT_DEFINED")
     NAS_IP = 'vvzunin.me'
     NAS_PORT = 10003
     dsm_version = '7'
@@ -189,8 +191,10 @@ def upload_to_synology(dataset_id):
 
 
 def get_link_to_synology(dataset_id, param_id):
+    load_dotenv()
+    
     NAS_USER = 'project1290'
-    NAS_PASS = '~.*{*$7]NJ1[pS`\\'
+    NAS_PASS = os.getenv("NAS_PASS", "NOT_DEFINED")
     NAS_IP = 'vvzunin.me'
     NAS_PORT = 10003
     dsm_version = '7'

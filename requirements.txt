@@ -4,3 +4,4 @@ requests
 simplejson
 selenium
 optionaldict
+python-dotenv
