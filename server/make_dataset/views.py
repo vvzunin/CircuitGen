@@ -2,7 +2,9 @@ import pathlib
 import random
 import subprocess
 
-from time import sleep
+from dotenv import load_dotenv
+
+import psycopg2 # для выгрузки данных в postgreSQL
 
 from django.http import JsonResponse
 from django.http import HttpResponse
@@ -45,6 +47,10 @@ def add_dataset(request: HttpRequest):
     # запуск генератора
     run_generator(parameters_of_generation, dataset_id, flags, threads_num)
     print("run_generator is finished")
+
+    # создание базы данных - структура
+    create_db_for_dataset()
+
 
     # запуск Yosys
     # make_image_from_verilog(dataset_id)
@@ -148,11 +154,13 @@ def in_total_function(obj):
 
 
 def upload_to_synology(dataset_id):
-    NAS_USER = 'project1290'
-    NAS_PASS = '~.*{*$7]NJ1[pS`\\'
-    NAS_IP = 'vvzunin.me'
-    NAS_PORT = 10003
-    dsm_version = '7'
+    load_dotenv()
+    
+    NAS_USER = os.getenv("NAS_USER", "NOT_DEFINED_NAS_USER")
+    NAS_PASS = os.getenv("NAS_PASS", "NOT_DEFINED_NAS_PASS")
+    NAS_IP = os.getenv("NAS_IP", "NOT_DEFINED_NAS_IP")
+    NAS_PORT = int(os.getenv("NAS_PORT", "NOT_DEFINED_NAS_PORT"))
+    dsm_version = os.getenv("DSM_VERSION", "NOT_DEFINED_DSM_VERSION")
 
     with SynologyDrive(NAS_USER, NAS_PASS, NAS_IP, NAS_PORT, dsm_version=dsm_version) as synd:
         dataset_id = str(dataset_id)
@@ -177,8 +185,7 @@ def upload_to_synology(dataset_id):
                             with open(file_path, 'rb') as file:
                                 file_name = os.path.basename(file_path)
                                 bfile = io.BytesIO(file.read())
-                                bfile.name = f'{
-                                    dataset_id}/{sub_path}/{file_name}'
+                                bfile.name = f'{dataset_id}/{sub_path}/{file_name}'
 
                                 synd.upload_file(
                                     bfile,
@@ -189,11 +196,13 @@ def upload_to_synology(dataset_id):
 
 
 def get_link_to_synology(dataset_id, param_id):
-    NAS_USER = 'project1290'
-    NAS_PASS = '~.*{*$7]NJ1[pS`\\'
-    NAS_IP = 'vvzunin.me'
-    NAS_PORT = 10003
-    dsm_version = '7'
+    load_dotenv()
+    
+    NAS_USER = os.getenv("NAS_USER", "NOT_DEFINED_NAS_USER")
+    NAS_PASS = os.getenv("NAS_PASS", "NOT_DEFINED_NAS_PASS")
+    NAS_IP = os.getenv("NAS_IP", "NOT_DEFINED_NAS_IP")
+    NAS_PORT = int(os.getenv("NAS_PORT", "NOT_DEFINED_NAS_PORT"))
+    dsm_version = os.getenv("DSM_VERSION", "NOT_DEFINED_DSM_VERSION")
 
     with SynologyDrive(NAS_USER, NAS_PASS, NAS_IP, NAS_PORT, dsm_version=dsm_version) as synd:
         synd.create_folder(f'{dataset_id}/{param_id}',
@@ -239,3 +248,64 @@ def add_dataset_to_database(id_of_parameters_of_generation: HttpRequest):
     # получить параметры генерации
     dataset_id = str(dataset_id)
     return dataset_id, list_of_parameters_for_dataset, threads_num
+
+# соединение к БД PostgreSQL
+def create_connection():
+    load_dotenv()
+
+
+def create_db_for_dataset():
+    
+    # Параметры подключения к базе данных PostgreSQL
+    DB_USER = "postgres"
+    #DB_PASSWORD = "your_password_here"
+    DB_HOST = "localhost"
+    DB_PORT = "5432"
+    #DB_NAME = f"dataset_{dataset_id}"
+    DB_NAME = "CircuitGen"
+    
+    # Путь к SQL-скрипту для создания таблиц
+    ER_SCRIPT_PATH = os.getenv("ER_SCRIPT_PATH", "path_to_your_er_script.sql")
+    
+    # Создание базы данных и таблиц
+    create_database_and_tables(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, ER_SCRIPT_PATH)
+
+
+def create_database_and_tables(dbname, user, password, host, port, er_script_path):
+    # Подключаемся к PostgreSQL
+    conn = psycopg2.connect(dbname, user, password, host, port)
+    conn.autocommit = True
+    cursor = conn.cursor()
+    
+    # Создаём базу данных
+    try:
+        cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(dbname)))
+        print(f"Database {dbname} created successfully")
+    except Exception as e:
+        print(f"Failed to create database {dbname}: {e}")
+        cursor.close()
+        conn.close()
+        return
+    
+    cursor.close()
+    conn.close()
+    
+    # Подключаемся к новой базе данных
+    conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+    cursor = conn.cursor()
+    
+    # Читаем SQL-скрипт для создания таблиц и связей
+    with open(er_script_path, 'r') as file:
+        er_script = file.read()
+    
+    # Выполняем SQL-скрипт
+    try:
+        cursor.execute(er_script)
+        conn.commit()
+        print(f"Tables and relationships created successfully in {dbname}")
+    except Exception as e:
+        print(f"Failed to create tables and relationships: {e}")
+        conn.rollback()
+    
+    cursor.close()
+    conn.close()
