@@ -4,3 +4,6 @@ requests
 simplejson
 selenium
 optionaldict
+psycopg2-binary
+
+
