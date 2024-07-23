@@ -51,6 +51,9 @@ def add_dataset(request: HttpRequest):
     # создание базы данных - структура
     create_db_for_dataset()
 
+    # подключение к pgAdmin
+    get_pgadmin_web_ip()
+
 
     # запуск Yosys
     # make_image_from_verilog(dataset_id)
@@ -257,18 +260,22 @@ def create_connection():
 def create_db_for_dataset():
     
     # Параметры подключения к базе данных PostgreSQL
-    DB_USER = "postgres"
-    #DB_PASSWORD = "your_password_here"
-    DB_HOST = "localhost"
-    DB_PORT = "5432"
+    DB_USER = os.getenv("DB_USER","NOT_DEFINED_DB_USER")
+    DB_PASSWORD = os.getenv("DB_PASSWORD","NOT_DEFINED_DB_PASSWORD")
+    DB_HOST = os.getenv("DB_HOST","NOT_DEFINED_DB_HOST")
+    DB_PORT = os.getenv("DB_PORT","NOT_DEFINED_DB_PORT")
     #DB_NAME = f"dataset_{dataset_id}"
-    DB_NAME = "CircuitGen"
+    DB_NAME = os.getenv("DB_NAME","NOT_DEFINED_DB_NAME")
     
     # Путь к SQL-скрипту для создания таблиц
     ER_SCRIPT_PATH = os.getenv("ER_SCRIPT_PATH", "path_to_your_er_script.sql")
     
     # Создание базы данных и таблиц
-    create_database_and_tables(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, ER_SCRIPT_PATH)
+    try:
+        create_database_and_tables(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, ER_SCRIPT_PATH)
+        print(f"База данных '{DB_NAME}' успешно создана.")
+    except Exception as e:
+        print(f"Ошибка при создании базы данных '{DB_NAME}': {e}")
 
 
 def create_database_and_tables(dbname, user, password, host, port, er_script_path):
@@ -300,12 +307,37 @@ def create_database_and_tables(dbname, user, password, host, port, er_script_pat
     
     # Выполняем SQL-скрипт
     try:
-        cursor.execute(er_script)
-        conn.commit()
-        print(f"Tables and relationships created successfully in {dbname}")
+        create_database_and_tables(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, ER_SCRIPT_PATH)
+        print(f"Database '{DB_NAME}' created successfully.")
     except Exception as e:
-        print(f"Failed to create tables and relationships: {e}")
-        conn.rollback()
+        print(f"Error creating database '{DB_NAME}': {e}")
     
     cursor.close()
     conn.close()
+
+def get_pgadmin_web_ip():
+    # Параметры подключения к PostgreSQL
+    DB_USER = os.getenv("DB_USER","NOT_DEFINED_DB_USER")
+    DB_HOST = os.getenv("DB_HOST","NOT_DEFINED_DB_HOST")
+    DB_PORT = os.getenv("DB_PORT","NOT_DEFINED_DB_PORT")
+    PG_PORT = os.getenv("PG_PORT","NOT_DEFINED_PG_PORT") # порт pgAdmin
+    # для изменения нужно перейти в config.py pgAdmin с параметром SERVER_PORT
+    
+    try:
+        # Устанавливаем соединение с PostgreSQL
+        conn = psycopg2.connect(user=DB_USER, host=DB_HOST, port=DB_PORT)
+        conn.autocommit = True
+        cursor = conn.cursor()
+        
+        # Получаем IP-адрес сервера PostgreSQL
+        cursor.execute("SELECT inet_server_addr();")
+        ip_address = cursor.fetchone()[0]
+        
+        # Печатаем IP-адрес pgAdmin веб-интерфейса
+        print(f"IP адрес веб-версии pgAdmin: http://{ip_address}:{PG_PORT}/")  # Предполагается, что pgAdmin работает на порту 5050
+        
+        cursor.close()
+        conn.close()
+        
+    except psycopg2.Error as e:
+        print(f"Ошибка при подключении к PostgreSQL: {e}")
