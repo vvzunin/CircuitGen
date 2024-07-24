@@ -25,12 +25,19 @@ sudo /usr/pgadmin4/bin/setup-web.sh
 
 # Убедимся, что Apache запущен
 echo "Проверка и запуск Apache..."
+
+# Проверяем наличие команды systemctl
 if command -v systemctl >/dev/null; then
+    # Если systemctl доступен, используем его
     sudo systemctl enable apache2
     sudo systemctl start apache2
 else
-    sudo service apache2 start
-    sudo service apache2 enable
+    # Если systemctl не найден, проверяем наличие команды service
+    if command -v service >/dev/null; then
+        # Используем команду service для систем SysVinit или Upstart
+        sudo service apache2 start
+        sudo service apache2 restart
+    else
+        echo "Не найдены ни systemctl, ни service. Невозможно управлять Apache."
+    fi
 fi
-
-echo "Установка завершена. PostgreSQL и pgAdmin4 установлены."
