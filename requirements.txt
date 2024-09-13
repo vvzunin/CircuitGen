@@ -5,5 +5,4 @@ simplejson
 selenium
 optionaldict
 psycopg2-binary
-
-
+python-dotenv
