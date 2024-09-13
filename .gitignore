@@ -32,4 +32,4 @@ launch.json
 settings.json
 */.vscode
 .idea/*
-.env
+document.env
