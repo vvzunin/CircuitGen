@@ -33,3 +33,5 @@ settings.json
 */.vscode
 .idea/*
 .env
+myeasylog.log
+logs/*

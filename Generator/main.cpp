@@ -5,7 +5,6 @@
 #include <CircuitGenGenerator/CircuitGenGenerator.hpp>
 #include <CircuitGenGenerator/ThreadPool.hpp>
 #include <YosysUtils.hpp>
-
 #include <chrono>
 #include <filesystem>
 #include <fstream>
@@ -16,17 +15,36 @@
 
 #include "GraphAbcFolder.hpp"
 
+#define ELPP_DISABLE_LOGS
+#include "lib/easyloggingpp/easylogging++.h"
+
+#define ELPP_DISABLE_LOGS
+INITIALIZE_EASYLOGGINGPP
+
 using namespace std::chrono;
 using recursive_directory_iterator =
     std::filesystem::recursive_directory_iterator;
 
+void initLogging(std::string testName, std::string subtestName) {
+  el::Configurations conf("easylogging++.conf");
+  el::Loggers::reconfigureAllLoggers(conf);
+  el::Loggers::reconfigureAllLoggers(
+      el::ConfigurationType::Filename,
+      "logs/" + testName + "/" + subtestName + ".log");
+  el::Loggers::addFlag(el::LoggingFlag::NewLineForContainer);
+  el::Loggers::addFlag(el::LoggingFlag::LogDetailedCrashReason);
+  el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
+}
+
 int main(int argc, char** argv) {
+  // initLogging("main", "main");
   std::string jsonPath, filePath, directoryPath;
 
   bool makeBalanced = false;
   bool makeResyn2 = false;
   bool toBench = false;
   bool toFirrtl = false;
+  bool calcStats = false;
   bool moveToFolder = false;
 
   uint8_t threadsNumber = 1;
@@ -36,7 +54,7 @@ int main(int argc, char** argv) {
   const std::string defaultLibPath = "Generator/tech_libs/";
   // Use getopt to parse command line arguments
 
-  const char* const short_opts = "ht:f:j:rbd:mBFl:";
+  const char* const short_opts = "ht:f:j:rbcd:mBFl:";
   const option long_opts[] = {{"json_path", required_argument, nullptr, 'j'},
                               {"file_path", required_argument, nullptr, 'f'},
                               {"threads", required_argument, nullptr, 't'},
@@ -92,6 +110,9 @@ int main(int argc, char** argv) {
         break;
       case 'F':
         toFirrtl = true;
+        break;
+      case 'c':
+        calcStats = true;
         break;
       case 'h':
         std::cout << "---------------------------------------------------"
@@ -174,7 +195,6 @@ int main(int argc, char** argv) {
   std::vector<std::shared_ptr<GraphAbcFolder>> folder;
   // we always have one function to calc start stats
   int funcCount = ((int)makeBalanced) + ((int)makeResyn2) + 1;
-
   auto runInMultithread = [&](std::string path, std::string graph) {
     std::shared_ptr<GraphAbcFolder> ptr(
         new GraphAbcFolder(path, graph, libName, defaultLibPath, funcCount));
@@ -206,7 +226,7 @@ int main(int argc, char** argv) {
     std::vector<std::pair<std::string, std::vector<std::string>>> allRes =
         CircuitGenGenerator::runGenerationFromJsonForPath(jsonPath);
 
-    if (!(makeResyn2 || makeBalanced || toBench || toFirrtl)) {
+    if (!(makeResyn2 || makeBalanced || toBench || toFirrtl || calcStats)) {
       return 0;
     }
 
@@ -219,7 +239,7 @@ int main(int argc, char** argv) {
     }
   }
   // used for parsing one file or dir
-  else if (makeResyn2 || makeBalanced || toBench || toFirrtl) {
+  else if (makeResyn2 || makeBalanced || toBench || toFirrtl || calcStats) {
     if (filePath.size()) {
       std::string graph = std::filesystem::path(filePath).stem();
       std::string path = std::filesystem::path(filePath).parent_path();

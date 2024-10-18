@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(OptimizationsVerilogLib)
 FetchContent_Declare(
   CircuitGen_Generator
   GIT_REPOSITORY https://github.com/vvzunin/CircuitGen_Generator
-  GIT_TAG 4c6c8ca
+  GIT_TAG 53310b2f4
 )
 FetchContent_MakeAvailable(CircuitGen_Generator)
 
@@ -31,3 +31,18 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   OptimizationsVerilogLib::OptimizationsVerilogLib
 )
 
+if(NOT TARGET easylogging++)
+  add_library(
+    easylogging++ STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/easyloggingpp/easylogging++.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/easyloggingpp/easylogging++.h
+  )
+endif()
+
+configure_file(
+  easylogging++.conf
+  easylogging++.conf
+  COPYONLY
+)
+
+target_link_libraries(CircuitGen PRIVATE easylogging++)

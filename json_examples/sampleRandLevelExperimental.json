@@ -3,16 +3,16 @@
     "seed": 2,
     "dataset_id": "12",
     "id": 50,
-    "type_of_generation": "Rand Level Experimental",
-    "min_in": 50,
-    "max_in": 50,
-    "min_out": 50,
-    "max_out": 50,
-    "repeat_n": 1,    
-    "multithread": 4,
-    "make_graphml_classic": true,
-    "make_graphml_pseudo_abc_d": true,
-    "make_graphml_open_abc_d": true,
+    "type_of_generation": "Rand Level",
+    "min_in": 5,
+    "max_in": 5,
+    "min_out": 5,
+    "max_out": 5,
+    "repeat_n": 20,    
+    "multithread": 16,
+    "make_graphml_classic": false,
+    "make_graphml_pseudo_abc_d": false,
+    "make_graphml_open_abc_d": false,
     "create_id_directories": true,
     
     "gates_inputs_info": {
@@ -24,9 +24,9 @@
       "xnor": [2, 16, 8]
     },
 
-    "min_level": 200,
-    "max_level": 200,
-    "min_elem": 5000,
-    "max_elem": 5000
+    "min_level": 50,
+    "max_level": 50,
+    "min_elem": 50,
+    "max_elem": 50
   }
 ]
