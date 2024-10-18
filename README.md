@@ -68,6 +68,13 @@ chmod +x buildGenerator.sh
 ```
 После начнется установка дополнительных пакетов, требующихся для функционирования данной утилиты.
 
+## Сборка базы данных
+Для сборки необходимо выполнить следующие команды:
+```
+chmod +x install_pgadmin.sh
+./install_pgadmin.sh
+```
+
 ## Backend + frontend
 <a name="backend_frontend_rus"></a> 
 ### Установка

@@ -35,3 +35,4 @@ settings.json
 .env
 myeasylog.log
 logs/*
+document.env
