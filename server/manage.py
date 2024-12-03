@@ -13,16 +13,14 @@ def main():
     try:
         from django.core.management import execute_from_command_line
         import django
-        django.setup()  # Инициализация приложений Django
-        from make_dataset.views import create_db_for_dataset  # Импорт после настройки Django
+        django.setup()
+        from make_dataset.views import create_db_for_dataset
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    
-    # Вызов вашей функции здесь, если это необходимо
     create_db_for_dataset()
 
     execute_from_command_line(sys.argv)
