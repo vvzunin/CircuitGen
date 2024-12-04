@@ -79,6 +79,26 @@ chmod +x install_pgadmin.sh
 <a name="backend_frontend_rus"></a> 
 ### Установка
 <a name="install_rus"></a> 
+Предварительно требуется создать .env файл следующего содержщания (укажите свои значения для переменных):
+```
+NAS_USER="USER_NAME"
+NAS_PASS="YOUR_PASSWORD"
+NAS_IP="NAS_DOMEN_NAME"
+NAS_PORT="NAS_PORT"
+DSM_VERSION="DSM_VERSION"
+
+DB_USER="postgres"
+DB_PASSWORD="PASSWORD"
+DB_HOST="localhost"
+DB_PORT="5432"
+DB_NAME="CircuitGen"
+
+ER_SCRIPT_PATH=CircuitGen.sql
+
+PG_PORT="5050"
+```
+
+После требуется запустить следующее:
 ```
 pip install -r requirements.txt
 

@@ -280,7 +280,7 @@ def create_db_for_dataset():
 
 def create_database_and_tables(dbname, user, password, host, port, er_script_path):
     # Подключаемся к PostgreSQL
-    conn = psycopg2.connect(dbname, user, password, host, port)
+    conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
     conn.autocommit = True
     cursor = conn.cursor()
     
