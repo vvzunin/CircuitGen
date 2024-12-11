@@ -4,7 +4,7 @@ import subprocess
 
 from dotenv import load_dotenv
 
-import psycopg2 # для выгрузки данных в postgreSQL
+import psycopg2  # для выгрузки данных в postgreSQL
 
 from django.http import JsonResponse
 from django.http import HttpResponse
@@ -26,6 +26,8 @@ import shutil
 
 from make_dataset.synology_drive_api.drive import SynologyDrive
 
+from logconfig import setup_logging, check_log_file
+
 
 class DatasetList(viewsets.ModelViewSet):
     queryset = Dataset.objects.all()
@@ -33,42 +35,47 @@ class DatasetList(viewsets.ModelViewSet):
 
 
 def add_dataset(request: HttpRequest):
-    print("add_dataset is running")
+    logger.info("add_dataset is running")
 
-    values_for_db = json.loads(request.body.decode('utf-8'))
-    flags = values_for_db["flags"]
-    ids = values_for_db["id"]
+    try:
+        values_for_db = json.loads(request.body.decode('utf-8'))
+        flags = values_for_db["flags"]
+        ids = values_for_db["id"]
 
-    # добавить датасет в базу данных
-    dataset_id, parameters_of_generation, threads_num = add_dataset_to_database(
-        ids)
-    print("add_dataset_to_database is finished")
+        # добавить датасет в базу данных
+        dataset_id, parameters_of_generation, threads_num = add_dataset_to_database(
+            ids)
+        logger.info("add_dataset_to_database is finished")
 
-    # запуск генератора
-    run_generator(parameters_of_generation, dataset_id, flags, threads_num)
-    print("run_generator is finished")
+        # запуск генератора
+        run_generator(parameters_of_generation, dataset_id, flags, threads_num)
+        logger.info("run_generator is finished")
 
-    # создание базы данных - структура
-    create_db_for_dataset()
+        # создание базы данных - структура
+        create_db_for_dataset()
+        logger.info("create_db_for_dataset is finished")
 
-    # подключение к pgAdmin
-    get_pgadmin_web_ip()
+        # подключение к pgAdmin
+        get_pgadmin_web_ip()
+        logger.info("get_pgadmin_web_ip is finished")
 
+        # запуск Yosys
+        # make_image_from_verilog(dataset_id)
+        logger.info("make_image_from_verilog is finished")
 
-    # запуск Yosys
-    # make_image_from_verilog(dataset_id)
-    print("make_image_from_verilog is finished")
+        # загрузка Synology Drive
+        upload_to_synology(dataset_id)
+        logger.info("upload_to_synology is finished")
 
-    # загрузка Synology Drive
-    upload_to_synology(dataset_id)
-    print("upload_to_synology is finished")
+        # удалить локальную папку с датасетом
+        delete_folders(dataset_id)
+        logger.info("delete_folders is finished")
 
-    # удалить локальную папку с датасетом
-    delete_folders(dataset_id)
-    print("delete_folders is finished")
-
-    print("add_dataset is finished")
-    return HttpResponse("Ok")
+        logger.info("add_dataset is finished")
+        return HttpResponse("Ok")
+    except Exception as e:
+        logger.exception(f"Error in add_dataset: {e}")
+        return HttpResponse(f"Error: {e}", status=500)
 
 
 def run_generator(parameters_of_generation, dataset_id, flags: dict, threads_num: int):
@@ -84,7 +91,7 @@ def run_generator(parameters_of_generation, dataset_id, flags: dict, threads_num
             elif key == "firrtl":
                 flags_str += "-F"
             else:
-                print(f"Unknown key: {key}")
+                logger.info(f"Unknown key: {key}")
 
     # print(parameters_of_generation)
     for obj in parameters_of_generation:
@@ -195,7 +202,7 @@ def upload_to_synology(dataset_id):
                                     dest_folder_path=f'/team-folders/circuits/datasets/'
                                 )
                         except Exception as e:
-                            print(e)
+                            logger.exception(e)
 
 
 def get_link_to_synology(dataset_id, param_id):
@@ -219,7 +226,7 @@ def delete_folders(dataset_id):
         for f in os.listdir('./jsons_for_generator'):
             os.remove(os.path.join('./jsons_for_generator', f))
     except OSError as e:
-        print("Error: %s - %s." % (e.filename, e.strerror))
+        logger.exception("Error: %s - %s." % (e.filename, e.strerror))
 
 
 def add_dataset_to_database(id_of_parameters_of_generation: HttpRequest):
@@ -273,9 +280,9 @@ def create_db_for_dataset():
     # Создание базы данных и таблиц
     try:
         create_database_and_tables(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, ER_SCRIPT_PATH)
-        print(f"База данных '{DB_NAME}' успешно создана.")
+        logger.info(f"The database '{DB_NAME}' created successfully.")
     except Exception as e:
-        print(f"Ошибка при создании базы данных '{DB_NAME}': {e}")
+        logger.exception(f"Error creating the database '{DB_NAME}': {e}")
 
 
 def create_database_and_tables(dbname, user, password, host, port, er_script_path):
@@ -287,9 +294,9 @@ def create_database_and_tables(dbname, user, password, host, port, er_script_pat
     # Создаём базу данных
     try:
         cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(dbname)))
-        print(f"Database {dbname} created successfully")
+        logger.info(f"Database {dbname} created successfully")
     except Exception as e:
-        print(f"Failed to create database {dbname}: {e}")
+        logger.exception(f"Failed to create database {dbname}: {e}")
         cursor.close()
         conn.close()
         return
@@ -308,9 +315,9 @@ def create_database_and_tables(dbname, user, password, host, port, er_script_pat
     # Выполняем SQL-скрипт
     try:
         create_database_and_tables(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, ER_SCRIPT_PATH)
-        print(f"Database '{DB_NAME}' created successfully.")
+        logger.info(f"Database '{DB_NAME}' created successfully.")
     except Exception as e:
-        print(f"Error creating database '{DB_NAME}': {e}")
+        logger.exception(f"Error creating database '{DB_NAME}': {e}")
     
     cursor.close()
     conn.close()
@@ -334,10 +341,10 @@ def get_pgadmin_web_ip():
         ip_address = cursor.fetchone()[0]
         
         # Печатаем IP-адрес pgAdmin веб-интерфейса
-        print(f"IP адрес веб-версии pgAdmin: http://{ip_address}:{PG_PORT}/")  # Предполагается, что pgAdmin работает на порту 5050
+        logger.info(f"The IP address of the pgAdmin web version: http://{ip_address}:{PG_PORT}/")  # Предполагается, что pgAdmin работает на порту 5050
         
         cursor.close()
         conn.close()
         
     except psycopg2.Error as e:
-        print(f"Ошибка при подключении к PostgreSQL: {e}")
+        logger.exception(f"Error connecting to PostgreSQL: {e}")
