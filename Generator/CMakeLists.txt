@@ -51,7 +51,7 @@ configure_file(
 )
 
 target_include_directories(
-  CircuitGen_lib ${warning_guard}
+  CircuitGen ${warning_guard}
   PUBLIC
   "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
 )
@@ -63,6 +63,7 @@ if(PROJECT_IS_TOP_LEVEL)
   option(BUILD_TESTS "Build test." ON)
 
   if(BUILD_TESTS)
+    message("Add tests")
     add_subdirectory(test)
   endif()
 endif()

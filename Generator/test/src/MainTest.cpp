@@ -2,7 +2,7 @@
 
 #include "main.cpp"
 
-#include "GraphAbcFolder.hpp"
+#include "../GraphAbcFolder.hpp"
 
 #include <gtest/gtest.h>
 
