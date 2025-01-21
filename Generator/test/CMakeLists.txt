@@ -44,8 +44,16 @@ enable_testing()
 
 # ---- Tests ----
 
+if(NOT TARGET easylogging++)
+  add_library(
+    easylogging++ STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/easyloggingpp/easylogging++.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/easyloggingpp/easylogging++.h
+  )
+endif()
+
 configure_file(
-  ../Generator/easylogging++.conf
+  ../easylogging++.conf
   easylogging++.conf
   COPYONLY
 )
@@ -64,7 +72,7 @@ function(add_new_test name)
       CircuitGenGenerator::CircuitGenGenerator
       CircuitGenGraph::CircuitGenGraph
       OptimizationsVerilogLib::OptimizationsVerilogLib
-    
+      easylogging++
   )
 
   target_compile_features(CircuitGen_test_${name} PRIVATE cxx_std_17)
@@ -72,7 +80,7 @@ function(add_new_test name)
   target_include_directories(
     CircuitGen_test_${name} ${warning_guard}
     PUBLIC
-      "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/../Generator>"
+      "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/.."
       "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
   )
   add_test(NAME ${name} COMMAND CircuitGen_test_${name})

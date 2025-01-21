@@ -7,8 +7,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -std=c++17 -fPIC")
 SET(GCC_COVERAGE_LINK_FLAGS "-lgcov")
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(lib)
+include_directories(lib)
+
 include(ExternalProject)
 include(FetchContent)
+
+option(CircuitGenGenerator_BUILD_TESTS "Build CircuitGen tests" ON)
 
 FetchContent_Declare(
   OptimizationsVerilogLib
@@ -45,4 +50,31 @@ configure_file(
   COPYONLY
 )
 
-target_link_libraries(CircuitGen PRIVATE easylogging++)
+target_include_directories(
+  CircuitGen_lib ${warning_guard}
+  PUBLIC
+  "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
+)
+
+target_link_libraries(CircuitGen PRIVATE
+ easylogging++)
+
+if(PROJECT_IS_TOP_LEVEL)
+  option(BUILD_TESTS "Build test." ON)
+
+  if(BUILD_TESTS)
+    add_subdirectory(test)
+  endif()
+endif()
+
+# ---- Developer mode ----
+# if(NOT CircuitGenGenerator_DEVELOPER_MODE)
+#   return()
+# elseif(NOT PROJECT_IS_TOP_LEVEL)
+#   message(
+#     AUTHOR_WARNING
+#     "Developer mode is intended for developers of CircuitGenGenerator"
+#   )
+# endif()
+
+# include(cmake/dev-mode.cmake)
